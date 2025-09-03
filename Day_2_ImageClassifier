@@ -1,0 +1,60 @@
+# import necessary libraries 
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras import datasets, layers , models
+from tensorflow.keras.utils import to_categorical
+import matplotlib.pyplot as plt
+
+# Load the MNIST dataset
+(train_images, train_lables), (test_images, test_lables) = datasets.mnist.load_data()
+# preprocessing: Normalize the pixel values to be between 0 and 1
+# to scale the values between 0 and 1 making the trainig faster and more stable 
+train_images = train_images /255.0
+test_images = test_images /255.0
+
+# Reshap the image to (28,28,1) as they are grayscale
+#                    () hight , width , 1 color channel)
+train_images = train_images.reshape((train_images.shape[0],28,28,1))
+test_images = test_images.reshape((test_images.shape[0],28,28,1))
+
+#convert the lables to one-hot encoded format
+train_lables = to_categorical(train_lables)
+test_lables = to_categorical(test_lables)
+
+#build the CNN model
+model = models.Sequential()
+model.add(layers.Conv2D(32, (3,3), activation='relu', input_shape=(28,28,1)))
+# 32 : is the number of filters will apply , 3 pixels,3 pixels , relu : is the activation function applied to each pixel setting negative values to zero 
+model.add(layers.MaxPooling2D((2,2)))
+#second convolutional Layer 
+model.add(layers.Conv2D(64, (3,3), activation='relu'))
+model.add(layers.MaxPooling2D((2,2)))
+#third convolutional layer
+model.add(layers.Conv2D(64, (3,3), activation='relu'))
+
+# Flatten the 3D output to 1D and add Dense layer 
+model.add(layers.Flatten())
+model.add(layers.Dense(64, activation ='relu'))
+#output layer with 10 neurons (for 10 digit classes)
+model.add(layers.Dense(10, activation ='softmax'))
+# this will create the final layer with 10 units for each digit which is 0 to 9
+# I am using softmax which converts the output to probabilities , helping the model classify each digit
+
+# compile the model
+model.compile(optimizer='adam' , loss='categorical_crossentropy', metrics=['accuracy']) 
+
+# Train the model
+
+model.fit(train_images, train_lables, epochs=5, batch_size=64, validation_data=(test_images, test_lables))
+
+# Evaluate the model on test data
+test_loss, test_accuracy = model.evaluate(test_images, test_lables)
+print(f'Test accuracy:{test_accuracy*100:2f}%')
+
+# Make predictions on test images
+predictions = model.predict(test_images)
+print(f'Prediction for first test image: {np.argmax(predictions[0])}')
+
+plt.imshow(test_images[0].reshape(28,28), cmap='gray')
+plt.title(f'predicted label: {predictions[0].argmax()}')
+plt.show()
