@@ -14,3 +14,6 @@ Build IMAGE CLASSIFIER USING KERAS AND TENSORFLOW
 - Train the Model
 - Evaluate and make Predictions
   [You can now view your Streamlit app in your browser.](https://cuddly-carnival-9r9w6p99x643px6v-8501.app.github.dev/)
+
+# Day 3
+Simple Chatbot using predefined responses
